@@ -1,5 +1,5 @@
 import { Resume, AnalysisResult, Skills } from '../../domain/entities';
-import { OpenAIService, PdfParseService, logger } from '../../infrastructure';
+import { AIService, PdfParseService, logger } from '../../infrastructure';
 import { MatchJobDescription } from './MatchJobDescription';
 
 interface AnalyzeResumeInput {
@@ -10,12 +10,12 @@ interface AnalyzeResumeInput {
 
 export class AnalyzeResume {
   private pdfService: PdfParseService;
-  private aiService: OpenAIService;
+  private aiService: AIService;
   private matchService: MatchJobDescription;
 
   constructor() {
     this.pdfService = new PdfParseService();
-    this.aiService = new OpenAIService();
+    this.aiService = new AIService();
     this.matchService = new MatchJobDescription();
   }
 

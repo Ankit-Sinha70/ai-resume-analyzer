@@ -6,8 +6,11 @@ dotenv.config();
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().default('3001'),
-  OPENAI_API_KEY: z.string().min(1, 'OpenAI API key is required'),
   FRONTEND_URL: z.string().default('http://localhost:3000'),
+  AI_PROVIDER: z.enum(['openai', 'gemini', 'groq', 'mock']).default('openai'),
+  OPENAI_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  GROQ_API_KEY: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -17,4 +20,18 @@ if (!parsed.success) {
   throw new Error('Invalid environment variables');
 }
 
-export const env = parsed.data;
+const env = parsed.data;
+
+if (env.AI_PROVIDER === 'openai' && !env.OPENAI_API_KEY) {
+  throw new Error('OPENAI_API_KEY is required when AI_PROVIDER is set to openai');
+}
+
+if (env.AI_PROVIDER === 'gemini' && !env.GEMINI_API_KEY) {
+  throw new Error('GEMINI_API_KEY is required when AI_PROVIDER is set to gemini');
+}
+
+if (env.AI_PROVIDER === 'groq' && !env.GROQ_API_KEY) {
+  throw new Error('GROQ_API_KEY is required when AI_PROVIDER is set to groq');
+}
+
+export { env };
