@@ -1,0 +1,30 @@
+{
+  "name": "ai-resume-analyzer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered resume analyzer that matches resumes against job descriptions",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm -w frontend run dev",
+    "dev:backend": "npm -w backend run dev",
+    "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
+    "build:frontend": "npm -w frontend run build",
+    "build:backend": "npm -w backend run build",
+    "build:shared": "npm -w shared run build",
+    "start:backend": "npm -w backend run start",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "npm -w frontend run lint",
+    "lint:backend": "npm -w backend run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
