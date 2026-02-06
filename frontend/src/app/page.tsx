@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FileUpload } from '@/components/FileUpload';
 import { JobDescriptionInput } from '@/components/JobDescriptionInput';
+import { analyzeResume, getProviderInfo } from '@/lib/api';
+import { AnalysisResult, ProviderInfo } from '@/types';
+import { FileText, Briefcase, Sparkles, Loader2 } from 'lucide-react';
 import { AnalysisResults } from '@/components/AnalysisResults';
-import { analyzeResume } from '@/lib/api';
-import { AnalysisResult } from '@/types';
-import { FileText, Briefcase, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -14,10 +14,19 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [fileError, setFileError] = useState<string>('');
+  const [providerInfo, setProviderInfo] = useState<ProviderInfo | null>(null);
+
+  useEffect(() => {
+    getProviderInfo().then((info) => {
+      if (info) setProviderInfo(info);
+    });
+  }, []);
 
   const handleAnalyze = async () => {
-    if (!file || !jobDescription.trim()) {
-      setError('Please upload a resume and provide a job description');
+    const validation = validateInputs(file, jobDescription);
+    if (validation) {
+      setError(validation);
       return;
     }
 
@@ -26,7 +35,7 @@ export default function Home() {
     setResult(null);
 
     try {
-      const response = await analyzeResume(file, jobDescription);
+      const response = await analyzeResume(file as File, jobDescription);
       if (response.success && response.data) {
         setResult(response.data);
       } else {
@@ -44,6 +53,16 @@ export default function Home() {
     setJobDescription('');
     setResult(null);
     setError(null);
+    setFileError('');
+  };
+
+  const validateInputs = (resume: File | null, description: string): string | null => {
+    if (!resume) return 'Please upload a PDF resume (max 10MB).';
+    if (resume.type !== 'application/pdf') return 'Only PDF files are allowed.';
+    if (resume.size > 10 * 1024 * 1024) return 'File is too large. Max size is 10MB.';
+    if (!description.trim()) return 'Please provide a job description.';
+    if (description.trim().length < 50) return 'Job description is too short (minimum 50 characters).';
+    return null;
   };
 
   return (
@@ -63,6 +82,13 @@ export default function Home() {
             Upload your resume and paste a job description to see how well you match.
             Get actionable suggestions to improve your chances.
           </p>
+          {providerInfo && (
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm text-primary-700">
+              <span className="font-semibold">Provider:</span>
+              <span className="uppercase">{providerInfo.aiProvider}</span>
+              <span className="text-gray-500">({providerInfo.aiModel})</span>
+            </div>
+          )}
         </div>
 
         {/* Main Content */}
@@ -79,6 +105,11 @@ export default function Home() {
               <FileUpload
                 file={file}
                 onFileChange={setFile}
+                onError={(msg) => {
+                  setFileError(msg);
+                  if (msg) setError(msg);
+                }}
+                error={fileError}
                 disabled={isLoading}
               />
             </div>
@@ -100,8 +131,8 @@ export default function Home() {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p className="text-red-700">{error}</p>
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
               </div>
             )}
 
@@ -147,6 +178,11 @@ export default function Home() {
           </div>
         )}
       </div>
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
     </main>
   );
 }

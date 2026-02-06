@@ -15,11 +15,11 @@ export class Skills implements ExtractedSkills {
   languages: string[];
 
   constructor(data: Partial<ExtractedSkills> = {}) {
-    this.technicalSkills = data.technicalSkills || [];
-    this.softSkills = data.softSkills || [];
-    this.tools = data.tools || [];
-    this.frameworks = data.frameworks || [];
-    this.languages = data.languages || [];
+    this.technicalSkills = this.normalizeList(data.technicalSkills);
+    this.softSkills = this.normalizeList(data.softSkills);
+    this.tools = this.normalizeList(data.tools);
+    this.frameworks = this.normalizeList(data.frameworks);
+    this.languages = this.normalizeList(data.languages);
   }
 
   getAllSkills(): string[] {
@@ -34,5 +34,23 @@ export class Skills implements ExtractedSkills {
 
   isEmpty(): boolean {
     return this.getAllSkills().length === 0;
+  }
+
+  private normalizeList(list?: string[]): string[] {
+    if (!list || list.length === 0) return [];
+    const seen = new Set<string>();
+    const cleaned: string[] = [];
+
+    for (const item of list) {
+      if (!item) continue;
+      const trimmed = item.trim();
+      if (!trimmed) continue;
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      cleaned.push(trimmed);
+    }
+
+    return cleaned;
   }
 }

@@ -84,6 +84,8 @@ export class AnalyzeResume {
         frameworks: jobSkills.frameworks,
         languages: jobSkills.languages,
       },
+      matchedSkillDetails: matchResult.matchedSkillDetails,
+      missingSkillDetails: matchResult.missingSkillDetails,
     });
 
     logger.info('Resume analysis completed', {

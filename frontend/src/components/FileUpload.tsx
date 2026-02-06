@@ -8,16 +8,19 @@ interface FileUploadProps {
   file: File | null;
   onFileChange: (file: File | null) => void;
   disabled?: boolean;
+  error?: string;
+  onError?: (message: string) => void;
 }
 
-export function FileUpload({ file, onFileChange, disabled }: FileUploadProps) {
+export function FileUpload({ file, onFileChange, disabled, error, onError }: FileUploadProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
         onFileChange(acceptedFiles[0]);
+        onError?.('');
       }
     },
-    [onFileChange]
+    [onFileChange, onError]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -28,6 +31,22 @@ export function FileUpload({ file, onFileChange, disabled }: FileUploadProps) {
     maxFiles: 1,
     maxSize: 10 * 1024 * 1024, // 10MB
     disabled,
+    onDropRejected: (rejections) => {
+      const first = rejections[0];
+      if (!first) return;
+      const reason = first.errors?.[0];
+      if (reason) {
+        if (reason.code === 'file-too-large') {
+          onError?.('File is too large. Max size is 10MB.');
+          return;
+        }
+        if (reason.code === 'file-invalid-type') {
+          onError?.('Only PDF files are allowed.');
+          return;
+        }
+        onError?.(reason.message || 'File was rejected.');
+      }
+    },
   });
 
   const removeFile = () => {
@@ -81,6 +100,7 @@ export function FileUpload({ file, onFileChange, disabled }: FileUploadProps) {
           <p className="text-gray-400 text-xs mt-2">PDF only, max 10MB</p>
         </>
       )}
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
     </div>
   );
 }
