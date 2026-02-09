@@ -7,6 +7,7 @@ import { analyzeResume, getProviderInfo } from '@/lib/api';
 import { AnalysisResult, ProviderInfo } from '@/types';
 import { FileText, Briefcase, Sparkles, Loader2 } from 'lucide-react';
 import { AnalysisResults } from '@/components/AnalysisResults';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -66,123 +67,169 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-blob mix-blend-multiply filter" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl animate-blob delay-2000 mix-blend-multiply filter" />
+        <div className="absolute -bottom-32 left-1/2 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl animate-blob delay-4000 mix-blend-multiply filter" />
+      </div>
+
+      <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 bg-primary-100 rounded-full">
-              <Sparkles className="w-8 h-8 text-primary-600" />
-            </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center justify-center p-2 bg-white/50 backdrop-blur-sm border border-white/40 rounded-full mb-6 shadow-sm">
+            <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-bold tracking-wide uppercase">
+              New
+            </span>
+            <span className="ml-2 text-sm text-gray-600 font-medium pr-2">
+              AI-Powered Analysis V2.0
+            </span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            AI Resume Analyzer
+
+          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 tracking-tight font-heading">
+            Optimize your resume with <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-purple-600">AI Precision</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload your resume and paste a job description to see how well you match.
-            Get actionable suggestions to improve your chances.
+
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Stop guessing. Upload your resume and job description to get a detailed Match Score
+            and actionable feedback to land the interview.
           </p>
+
           {providerInfo && (
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm text-primary-700">
-              <span className="font-semibold">Provider:</span>
-              <span className="uppercase">{providerInfo.aiProvider}</span>
-              <span className="text-gray-500">({providerInfo.aiModel})</span>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/60 backdrop-blur-sm border border-white/50 px-4 py-2 text-sm text-gray-600 shadow-sm"
+            >
+              <Sparkles className="w-4 h-4 text-primary-500" />
+              <span>Powered by </span>
+              <span className="font-semibold text-gray-900 uppercase">{providerInfo?.aiProvider}</span>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Main Content */}
         {!result ? (
-          <div className="space-y-8">
-            {/* Upload Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <FileText className="w-5 h-5 text-primary-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Upload Your Resume
-                </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="space-y-8"
+          >
+            <div className="grid md:grid-cols-1 gap-8">
+              {/* Upload Section */}
+              <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 transition-all duration-300 hover:shadow-2xl hover:bg-white/80">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="p-3 bg-blue-50 rounded-xl">
+                    <FileText className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 font-heading">
+                      1. Upload Your Resume
+                    </h2>
+                    <p className="text-gray-500 text-sm">PDF format, max 10MB</p>
+                  </div>
+                </div>
+                <FileUpload
+                  file={file}
+                  onFileChange={setFile}
+                  onError={(msg) => {
+                    setFileError(msg);
+                    if (msg) setError(msg);
+                  }}
+                  error={fileError}
+                  disabled={isLoading}
+                />
               </div>
-              <FileUpload
-                file={file}
-                onFileChange={setFile}
-                onError={(msg) => {
-                  setFileError(msg);
-                  if (msg) setError(msg);
-                }}
-                error={fileError}
-                disabled={isLoading}
-              />
-            </div>
 
-            {/* Job Description Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Briefcase className="w-5 h-5 text-primary-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Job Description
-                </h2>
+              {/* Job Description Section */}
+              <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 transition-all duration-300 hover:shadow-2xl hover:bg-white/80">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="p-3 bg-purple-50 rounded-xl">
+                    <Briefcase className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 font-heading">
+                      2. Add Job Description
+                    </h2>
+                    <p className="text-gray-500 text-sm">Paste the job requirements here</p>
+                  </div>
+                </div>
+                <JobDescriptionInput
+                  value={jobDescription}
+                  onChange={setJobDescription}
+                  disabled={isLoading}
+                />
               </div>
-              <JobDescriptionInput
-                value={jobDescription}
-                onChange={setJobDescription}
-                disabled={isLoading}
-              />
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="rounded-xl border border-red-200 bg-red-50/90 backdrop-blur-sm px-6 py-4 text-sm text-red-700 shadow-sm flex items-center gap-3"
+              >
+                <div className="w-2 h-2 rounded-full bg-red-500" />
                 {error}
-              </div>
+              </motion.div>
             )}
 
             {/* Analyze Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-4">
               <button
                 onClick={handleAnalyze}
                 disabled={isLoading || !file || !jobDescription.trim()}
-                className="px-8 py-3 bg-primary-600 text-white font-medium rounded-lg
-                         hover:bg-primary-700 focus:outline-none focus:ring-2 
-                         focus:ring-primary-500 focus:ring-offset-2
-                         disabled:bg-gray-400 disabled:cursor-not-allowed
-                         transition-colors duration-200 flex items-center gap-2"
+                className="group relative px-8 py-4 bg-gray-900 text-white font-bold rounded-xl
+                         hover:bg-primary-600 focus:outline-none focus:ring-4 
+                         focus:ring-primary-500/30 focus:ring-offset-2
+                         disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none
+                         transition-all duration-300 shadow-lg hover:shadow-primary-500/30
+                         flex items-center gap-3 text-lg overflow-hidden w-full md:w-auto justify-center"
               >
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
                 {isLoading ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Analyzing...
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Analyzing your fit...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5" />
-                    Analyze Resume
+                    <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                    Generate Analysis
                   </>
                 )}
               </button>
             </div>
-          </div>
+          </motion.div>
         ) : (
-          <div className="space-y-6">
-            <AnalysisResults result={result} />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-8"
+          >
+            <AnalysisResults result={result as AnalysisResult} />
             <div className="flex justify-center">
               <button
                 onClick={handleReset}
-                className="px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg
-                         hover:bg-gray-300 focus:outline-none focus:ring-2 
-                         focus:ring-gray-500 focus:ring-offset-2
-                         transition-colors duration-200"
+                className="px-6 py-3 bg-white text-gray-700 font-medium rounded-xl
+                         border border-gray-200 shadow-sm hover:bg-gray-50 
+                         focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2
+                         transition-all duration-200 hover:shadow-md"
               >
-                Analyze Another Resume
+                Mock another Interview
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
-      {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
     </main>
   );
 }
