@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import { Toaster } from 'sonner';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
 
 export const metadata: Metadata = {
   title: 'AI Resume Analyzer',
@@ -16,7 +20,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.variable} ${jakarta.variable} font-sans`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="absolute right-4 top-4 z-50">
+            <ThemeToggle />
+          </div>
+          {children}
+          <Toaster position="top-center" richColors />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

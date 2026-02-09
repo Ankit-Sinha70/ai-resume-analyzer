@@ -16,6 +16,8 @@ export interface AnalysisResult {
   suggestions: string[];
   resumeSkills: ExtractedSkills;
   jobSkills: ExtractedSkills;
+  matchedSkillDetails: SkillDetail[];
+  missingSkillDetails: SkillDetail[];
 }
 
 // API Response types
@@ -23,4 +25,15 @@ export interface AnalyzeResponse {
   success: boolean;
   data?: AnalysisResult;
   error?: string;
+}
+
+export interface SkillDetail {
+  skill: string;
+  rationale: string;
+}
+
+export interface ProviderInfo {
+  success: boolean;
+  aiProvider: string;
+  aiModel: string;
 }

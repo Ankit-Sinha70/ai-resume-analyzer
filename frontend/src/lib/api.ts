@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AnalyzeResponse } from '@/types';
+import { AnalyzeResponse, ProviderInfo } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -26,10 +26,12 @@ export async function analyzeResume(
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
       const message = error.response?.data?.error || error.message;
+      const friendly = formatError(message, status);
       return {
         success: false,
-        error: message,
+        error: friendly,
       };
     }
     return {
@@ -46,4 +48,29 @@ export async function checkHealth(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export async function getProviderInfo(): Promise<ProviderInfo | null> {
+  try {
+    const response = await api.get<ProviderInfo>('/api/health');
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+function formatError(message: string, status?: number): string {
+  const normalized = message.toLowerCase();
+
+  const isRateLimit =
+    status === 429 ||
+    normalized.includes('quota') ||
+    normalized.includes('rate limit') ||
+    normalized.includes('too many requests');
+
+  if (isRateLimit) {
+    return 'AI provider is temporarily rate-limited. Please wait a moment or switch providers, then try again.';
+  }
+
+  return message || 'An unexpected error occurred. Please try again.';
 }

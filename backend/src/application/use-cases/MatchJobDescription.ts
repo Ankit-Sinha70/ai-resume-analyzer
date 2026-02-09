@@ -5,6 +5,13 @@ interface MatchResult {
   matchedSkills: string[];
   missingSkills: string[];
   additionalSkills: string[];
+  matchedSkillDetails: SkillDetail[];
+  missingSkillDetails: SkillDetail[];
+}
+
+interface SkillDetail {
+  skill: string;
+  rationale: string;
 }
 
 export class MatchJobDescription {
@@ -20,12 +27,17 @@ export class MatchJobDescription {
     // Find matched skills
     const matchedSkills: string[] = [];
     const matchedNormalized = new Set<string>();
+    const matchedSkillDetails: SkillDetail[] = [];
 
     for (const jobSkill of normalizedJobSkills) {
       for (const resumeSkill of normalizedResumeSkills) {
         if (this.skillsMatch(resumeSkill.normalized, jobSkill.normalized)) {
           matchedSkills.push(jobSkill.original);
           matchedNormalized.add(jobSkill.normalized);
+          matchedSkillDetails.push({
+            skill: jobSkill.original,
+            rationale: `Found matching resume skill: "${resumeSkill.original}"`,
+          });
           break;
         }
       }
@@ -35,6 +47,13 @@ export class MatchJobDescription {
     const missingSkills = normalizedJobSkills
       .filter(skill => !matchedNormalized.has(skill.normalized))
       .map(skill => skill.original);
+
+    const missingSkillDetails: SkillDetail[] = normalizedJobSkills
+      .filter(skill => !matchedNormalized.has(skill.normalized))
+      .map(skill => ({
+        skill: skill.original,
+        rationale: 'Required in job description but not found in resume.',
+      }));
 
     // Find additional skills (in resume but not required by job)
     const additionalSkills = normalizedResumeSkills
@@ -55,6 +74,8 @@ export class MatchJobDescription {
       matchedSkills: [...new Set(matchedSkills)],
       missingSkills: [...new Set(missingSkills)],
       additionalSkills: [...new Set(additionalSkills)],
+      matchedSkillDetails,
+      missingSkillDetails,
     };
   }
 

@@ -8,6 +8,13 @@ export interface AnalysisResultData {
   suggestions: string[];
   resumeSkills: ExtractedSkills;
   jobSkills: ExtractedSkills;
+  matchedSkillDetails: SkillDetail[];
+  missingSkillDetails: SkillDetail[];
+}
+
+export interface SkillDetail {
+  skill: string;
+  rationale: string;
 }
 
 export class AnalysisResult implements AnalysisResultData {
@@ -18,6 +25,8 @@ export class AnalysisResult implements AnalysisResultData {
   suggestions: string[];
   resumeSkills: ExtractedSkills;
   jobSkills: ExtractedSkills;
+  matchedSkillDetails: SkillDetail[];
+  missingSkillDetails: SkillDetail[];
 
   constructor(data: AnalysisResultData) {
     this.matchPercentage = data.matchPercentage;
@@ -27,6 +36,8 @@ export class AnalysisResult implements AnalysisResultData {
     this.suggestions = data.suggestions;
     this.resumeSkills = data.resumeSkills;
     this.jobSkills = data.jobSkills;
+    this.matchedSkillDetails = data.matchedSkillDetails;
+    this.missingSkillDetails = data.missingSkillDetails;
   }
 
   isGoodMatch(): boolean {
@@ -42,6 +53,8 @@ export class AnalysisResult implements AnalysisResultData {
       suggestions: this.suggestions,
       resumeSkills: this.resumeSkills,
       jobSkills: this.jobSkills,
+      matchedSkillDetails: this.matchedSkillDetails,
+      missingSkillDetails: this.missingSkillDetails,
     };
   }
 }
