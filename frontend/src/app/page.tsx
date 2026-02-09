@@ -67,7 +67,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Background Decor */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-blob mix-blend-multiply filter" />
@@ -92,11 +92,11 @@ export default function Home() {
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 tracking-tight font-heading">
-            Optimize your resume with <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-purple-600">AI Precision</span>
+          <h1 className="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 tracking-tight font-heading">
+            Optimize your resume with <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-purple-600 dark:from-primary-400 dark:to-purple-400">AI Precision</span>
           </h1>
 
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
             Stop guessing. Upload your resume and job description to get a detailed Match Score
             and actionable feedback to land the interview.
           </p>
@@ -106,7 +106,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/60 backdrop-blur-sm border border-white/50 px-4 py-2 text-sm text-gray-600 shadow-sm"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/50 dark:border-gray-700 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 shadow-sm"
             >
               <Sparkles className="w-4 h-4 text-primary-500" />
               <span>Powered by </span>
@@ -125,16 +125,16 @@ export default function Home() {
           >
             <div className="grid md:grid-cols-1 gap-8">
               {/* Upload Section */}
-              <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 transition-all duration-300 hover:shadow-2xl hover:bg-white/80">
+              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 dark:border-gray-700 p-8 transition-all duration-300 hover:shadow-2xl hover:bg-white/80 dark:hover:bg-gray-800/90">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="p-3 bg-blue-50 rounded-xl">
                     <FileText className="w-6 h-6 text-primary-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 font-heading">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white font-heading">
                       1. Upload Your Resume
                     </h2>
-                    <p className="text-gray-500 text-sm">PDF format, max 10MB</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">PDF format, max 10MB</p>
                   </div>
                 </div>
                 <FileUpload
@@ -150,16 +150,16 @@ export default function Home() {
               </div>
 
               {/* Job Description Section */}
-              <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 transition-all duration-300 hover:shadow-2xl hover:bg-white/80">
+              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 dark:border-gray-700 p-8 transition-all duration-300 hover:shadow-2xl hover:bg-white/80 dark:hover:bg-gray-800/90">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3 bg-purple-50 rounded-xl">
-                    <Briefcase className="w-6 h-6 text-purple-600" />
+                  <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
+                    <Briefcase className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 font-heading">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white font-heading">
                       2. Add Job Description
                     </h2>
-                    <p className="text-gray-500 text-sm">Paste the job requirements here</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">Paste the job requirements here</p>
                   </div>
                 </div>
                 <JobDescriptionInput
