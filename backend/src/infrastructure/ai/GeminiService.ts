@@ -1,8 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { env } from '../../config';
-import { ExtractedSkills, Skills } from '../../domain/entities';
-import { SKILL_EXTRACTION_PROMPT, SUGGESTIONS_PROMPT } from './prompts';
+import { ExtractedSkills, Skills, QualityCheckResult, QualityCheckResultData } from '../../domain/entities';
+import { SKILL_EXTRACTION_PROMPT, SUGGESTIONS_PROMPT, QUALITY_CHECK_PROMPT } from './prompts';
 import { logger } from '../logging/logger';
+
 
 export class GeminiService {
   private client = new GoogleGenerativeAI(env.GEMINI_API_KEY as string);
@@ -27,6 +28,27 @@ export class GeminiService {
       throw new Error(`Gemini error: ${message}`);
     }
   }
+
+  async checkQuality(text: string): Promise<QualityCheckResult> {
+    try {
+      const prompt = QUALITY_CHECK_PROMPT.replace('{{resumeText}}', text);
+      const result = await this.model.generateContent(prompt);
+      const content = result.response.text()?.trim();
+
+      if (!content) {
+        logger.warn('Empty response from Gemini for quality check');
+        throw new Error('Empty response from AI');
+      }
+
+      const parsed = this.parseJsonResponse<QualityCheckResultData>(content);
+      return new QualityCheckResult(parsed);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown Gemini error';
+      logger.error('Error checking resume quality with Gemini:', error);
+      throw new Error(`Gemini error: ${message}`);
+    }
+  }
+
 
   async generateSuggestions(
     resumeSkills: string[],

@@ -1,8 +1,9 @@
 import OpenAI from 'openai';
 import { env } from '../../config';
-import { ExtractedSkills, Skills } from '../../domain/entities';
-import { SKILL_EXTRACTION_PROMPT, SUGGESTIONS_PROMPT } from './prompts';
+import { ExtractedSkills, Skills, QualityCheckResult, QualityCheckResultData } from '../../domain/entities';
+import { SKILL_EXTRACTION_PROMPT, SUGGESTIONS_PROMPT, QUALITY_CHECK_PROMPT } from './prompts';
 import { logger } from '../logging/logger';
+
 
 export class OpenAIService {
   private client: OpenAI;
@@ -35,7 +36,7 @@ export class OpenAIService {
       });
 
       const content = response.choices[0]?.message?.content?.trim();
-      
+
       if (!content) {
         logger.warn('Empty response from OpenAI for skill extraction');
         return new Skills();
@@ -49,6 +50,44 @@ export class OpenAIService {
       throw new Error('Failed to extract skills from text');
     }
   }
+
+  async checkQuality(text: string): Promise<QualityCheckResult> {
+
+    try {
+      const prompt = QUALITY_CHECK_PROMPT.replace('{{resumeText}}', text);
+
+      const response = await this.client.chat.completions.create({
+        model: this.model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a resume analysis engine. Return valid JSON only.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 1000,
+      });
+
+      const content = response.choices[0]?.message?.content?.trim();
+
+      if (!content) {
+        logger.warn('Empty response from OpenAI for quality check');
+        throw new Error('Empty response from AI');
+      }
+
+      const parsed = this.parseJsonResponse<QualityCheckResultData>(content);
+      return new QualityCheckResult(parsed);
+    } catch (error) {
+      logger.error('Error checking resume quality with OpenAI:', error);
+      throw new Error('Failed to check resume quality');
+    }
+  }
+
+
 
   async generateSuggestions(
     resumeSkills: string[],
@@ -82,7 +121,7 @@ export class OpenAIService {
       });
 
       const content = response.choices[0]?.message?.content?.trim();
-      
+
       if (!content) {
         logger.warn('Empty response from OpenAI for suggestions');
         return ['Consider tailoring your resume to match the job description more closely.'];

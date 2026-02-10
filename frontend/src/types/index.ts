@@ -37,3 +37,16 @@ export interface ProviderInfo {
   aiProvider: string;
   aiModel: string;
 }
+
+export interface QualityCheckResult {
+  isSuitable: boolean;
+  quality: 'excellent' | 'good' | 'average' | 'poor';
+  issues: string[];
+  summary: string;
+}
+
+export interface QualityCheckResponse {
+  success: boolean;
+  data?: QualityCheckResult;
+  error?: string;
+}
