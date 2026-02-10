@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/providers/ThemeProvider';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { CosmicBackground } from '@/components/CosmicBackground';
+import { CursorTrail } from '@/components/CursorTrail';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -27,9 +28,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <div className="absolute right-4 top-4 z-50">
-            <ThemeToggle />
-          </div> */}
+          <CosmicBackground />
+          <CursorTrail />
           {children}
           <Toaster position="top-center" richColors />
         </ThemeProvider>
