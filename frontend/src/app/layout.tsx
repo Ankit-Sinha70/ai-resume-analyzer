@@ -27,9 +27,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="absolute right-4 top-4 z-50">
+          {/* <div className="absolute right-4 top-4 z-50">
             <ThemeToggle />
-          </div>
+          </div> */}
           {children}
           <Toaster position="top-center" richColors />
         </ThemeProvider>

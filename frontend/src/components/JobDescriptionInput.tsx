@@ -11,32 +11,47 @@ export function JobDescriptionInput({
   onChange,
   disabled,
 }: JobDescriptionInputProps) {
+  const isValid = value.length >= 50;
+
   return (
-    <div>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        placeholder="Paste the job description here...
+    <div className="w-full flex flex-col h-full">
+      <div className="relative">
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          placeholder="Paste the job description here...
 
 Example:
-We are looking for a Senior Software Engineer with experience in:
-- React, TypeScript, and Node.js
-- Building scalable web applications
-- RESTful APIs and microservices
-- Cloud platforms (AWS/GCP/Azure)
-- Strong problem-solving skills"
-        className="w-full h-64 p-4 border border-gray-300 rounded-lg resize-none
-                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                   disabled:bg-gray-100 disabled:cursor-not-allowed
-                   placeholder:text-gray-400"
-      />
-      <p className="mt-2 text-sm text-gray-500">
-        {value.length} characters
-        {value.length > 0 && value.length < 50 && (
-          <span className="text-amber-600"> (minimum 50 characters)</span>
+We are seeking a Senior Software Engineer with:
+• 5+ years building scalable web applications
+• Strong experience with React, TypeScript, Node.js
+• Cloud platform expertise (AWS/GCP/Azure)
+• Excellent problem-solving and communication skills"
+          className="w-full min-h-[280px] p-4 bg-background border border-border rounded-lg resize-none
+                     focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
+                     disabled:cursor-not-allowed disabled:opacity-50
+                     placeholder:text-muted-foreground
+                     text-foreground text-sm leading-relaxed
+                     transition-all duration-200"
+        />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className={`h-1.5 w-1.5 rounded-full transition-colors ${isValid ? 'bg-primary-500' : 'bg-muted-foreground/30'
+            }`} />
+          <span className="text-xs text-muted-foreground">
+            {value.length} characters
+          </span>
+        </div>
+
+        {value.length > 0 && !isValid && (
+          <span className="text-xs text-amber-600 dark:text-amber-500">
+            Minimum 50 characters required
+          </span>
         )}
-      </p>
+      </div>
     </div>
   );
 }

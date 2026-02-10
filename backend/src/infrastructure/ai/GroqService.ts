@@ -1,8 +1,9 @@
 import Groq from 'groq-sdk';
 import { env } from '../../config';
-import { ExtractedSkills, Skills } from '../../domain/entities';
-import { SKILL_EXTRACTION_PROMPT, SUGGESTIONS_PROMPT } from './prompts';
+import { ExtractedSkills, Skills, QualityCheckResult, QualityCheckResultData } from '../../domain/entities';
+import { SKILL_EXTRACTION_PROMPT, SUGGESTIONS_PROMPT, QUALITY_CHECK_PROMPT } from './prompts';
 import { logger } from '../logging/logger';
+
 
 export class GroqService {
   private client = new Groq({ apiKey: env.GROQ_API_KEY });
@@ -33,6 +34,35 @@ export class GroqService {
       throw new Error(`Groq error: ${message}`);
     }
   }
+
+  async checkQuality(text: string): Promise<QualityCheckResult> {
+
+    try {
+      const prompt = QUALITY_CHECK_PROMPT.replace('{{resumeText}}', text);
+      const result = await this.client.chat.completions.create({
+        model: this.model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        max_tokens: 1024,
+      });
+
+      const content = result.choices[0]?.message?.content?.trim();
+
+      if (!content) {
+        logger.warn('Empty response from Groq for quality check');
+        throw new Error('Empty response from AI');
+      }
+
+      const parsed = this.parseJsonResponse<QualityCheckResultData>(content);
+      return new QualityCheckResult(parsed);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown Groq error';
+      logger.error('Error checking resume quality with Groq:', error);
+      throw new Error(`Groq error: ${message}`);
+    }
+  }
+
+
 
   async generateSuggestions(
     resumeSkills: string[],

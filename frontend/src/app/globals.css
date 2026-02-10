@@ -4,122 +4,132 @@
 
 @layer base {
   :root {
-    /* Modern Light Theme */
-    --background: 249 250 251;
-    /* #f9fafb (Main BG) */
-    --foreground: 15 23 42;
-    /* #0f172a (Dark Text) */
+    /* Enterprise Light Theme - Calm & Professional */
+    --background: 210 20% 98%;
+    /* #F8FAFC - Soft off-white */
+    --foreground: 222 47% 11%;
+    /* #0F172A - Deep slate for headings */
 
-    --card: 255 255 255;
-    /* #ffffff */
-    --card-foreground: 15 23 42;
-    /* #0f172a */
+    --card: 0 0% 100%;
+    /* #FFFFFF - Pure white cards */
+    --card-foreground: 215 25% 27%;
+    /* #475569 - Body text */
 
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 79 70 229;
-    /* #4f46e5 (Indigo) */
-    --primary-foreground: 248 250 252;
-    /* #f8fafc */
+    /* Single accent color - Indigo/Violet */
+    --primary: 248 73% 69%;
+    /* #6D5EF6 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 6 182 212;
-    /* #06b6d4 (Cyan) */
-    --secondary-foreground: 248 250 252;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%;
+    /* #94A3B8 - Muted text */
 
-    --muted: 241 245 249;
-    /* #f1f5f9 */
-    --muted-foreground: 100 116 139;
-    /* #64748b */
+    --accent: 248 73% 69%;
+    /* Same as primary - single source */
+    --accent-foreground: 0 0% 100%;
 
-    --accent: 168 85 247;
-    /* #a855f7 (Purple) */
-    --accent-foreground: 248 250 252;
+    --border: 214 32% 91%;
+    /* #E5E7EB - Subtle borders */
+    --input: 214 32% 91%;
+    --ring: 248 73% 69%;
+    /* Accent for focus states */
 
-    --destructive: 239 68 68;
-    /* #ef4444 */
-    --destructive-foreground: 248 250 252;
-
-    --border: 226 232 240;
-    /* #e2e8f0 */
-    --input: 226 232 240;
-    --ring: 79 70 229;
-
-    --radius: 0.5rem;
+    --radius: 1rem;
+    /* 16px - Standard border radius */
   }
 
   .dark {
-    /* Premium Dark Theme */
-    --background: 11 17 32;
-    /* #0b1120 (Dark BG) */
-    --foreground: 226 232 240;
-    /* #e2e8f0 (Light Text) */
+    /* Enterprise Dark Theme - Deep & Comfortable */
+    --background: 222 47% 6%;
+    /* #0B1020 - Deep navy background */
+    --foreground: 210 40% 98%;
+    /* #F9FAFB - Almost white for headings */
 
-    --card: 17 24 39;
-    /* #111827 */
-    --card-foreground: 226 232 240;
+    --card: 215 28% 9%;
+    /* #111827 - Card background */
+    --card-foreground: 214 20% 83%;
+    /* #CBD5E1 - Body text */
 
-    --popover: 17 24 39;
-    --popover-foreground: 226 232 240;
+    --popover: 215 28% 9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 99 102 241;
-    /* #6366f1 (Lighter Indigo for dark mode) */
-    --primary-foreground: 248 250 252;
+    /* Single accent color - Same indigo */
+    --primary: 248 73% 69%;
+    /* #6D5EF6 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 34 211 238;
-    /* #22d3ee (Lighter Cyan) */
-    --secondary-foreground: 15 23 42;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 14% 54%;
+    /* #64748B - Muted text */
 
-    --muted: 30 41 59;
-    /* #1e293b */
-    --muted-foreground: 148 163 184;
-    /* #94a3b8 */
+    --accent: 248 73% 69%;
+    /* Same as primary */
+    --accent-foreground: 0 0% 100%;
 
-    --accent: 192 132 252;
-    /* #c084fc (Lighter Purple) */
-    --accent-foreground: 15 23 42;
-
-    --destructive: 248 113 113;
-    /* #f87171 */
-    --destructive-foreground: 15 23 42;
-
-    --border: 31 41 51;
-    /* #1f2933 */
-    --input: 31 41 51;
-    --ring: 99 102 241;
+    --border: 217 33% 17%;
+    /* #1F2937 - Subtle dark borders */
+    --input: 217 33% 17%;
+    --ring: 248 73% 69%;
   }
 }
 
 @layer base {
   * {
-    border-color: rgb(var(--border) / 0.2);
-    border-style: solid;
+    @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+
+  /* Clean card style - no glassmorphism */
+  .card {
+    @apply bg-card text-card-foreground rounded-2xl border border-border shadow-sm;
   }
 
-  .glass {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-glass;
+  /* Subtle hover elevation */
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-md;
   }
 
-  .dark .glass {
-    @apply bg-black/20 border-white/10;
+  /* Focus ring for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
   }
 
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-500;
+  /* Muted text utility */
+  .text-muted {
+    @apply text-muted-foreground;
   }
 
-  .dark .text-gradient {
-    @apply from-primary-400 to-accent-400;
+  /* Subtle animations only */
+  .animate-subtle-fade {
+    animation: subtleFade 0.3s ease-out;
+  }
+
+  @keyframes subtleFade {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Button press feedback */
+  .btn-press {
+    @apply active:scale-[0.98] transition-transform duration-100;
   }
 }

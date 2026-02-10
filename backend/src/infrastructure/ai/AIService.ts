@@ -1,6 +1,7 @@
 import { env } from '../../config';
-import { Skills } from '../../domain/entities';
+import { Skills, QualityCheckResult } from '../../domain/entities';
 import { OpenAIService } from './OpenAIService';
+
 import { GeminiService } from './GeminiService';
 import { GroqService } from './GroqService';
 
@@ -45,7 +46,30 @@ export class AIService {
     });
   }
 
+  async checkQuality(text: string): Promise<QualityCheckResult> {
+    if (this.provider === 'openai' && this.openai) {
+      return this.openai.checkQuality(text);
+    }
+
+    if (this.provider === 'gemini' && this.gemini) {
+      return this.gemini.checkQuality(text);
+    }
+
+    if (this.provider === 'groq' && this.groq) {
+      return this.groq.checkQuality(text);
+    }
+
+    // Mock provider
+    return new QualityCheckResult({
+      isSuitable: true,
+      quality: 'good',
+      issues: ['Mock quality check'],
+      summary: 'This is a mock quality check result.',
+    });
+  }
+
   async generateSuggestions(
+
     resumeSkills: string[],
     jobSkills: string[],
     matchedSkills: string[],

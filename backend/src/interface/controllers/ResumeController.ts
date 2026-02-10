@@ -1,13 +1,46 @@
 import { Request, Response, NextFunction } from 'express';
-import { AnalyzeResume } from '../../application/use-cases';
+import { AnalyzeResume, CheckResumeQuality } from '../../application/use-cases';
 import { logger } from '../../infrastructure';
 
 export class ResumeController {
   private analyzeResume: AnalyzeResume;
+  private checkResumeQuality: CheckResumeQuality;
 
   constructor() {
     this.analyzeResume = new AnalyzeResume();
+    this.checkResumeQuality = new CheckResumeQuality();
   }
+
+  checkQuality = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.file) {
+        res.status(400).json({
+          success: false,
+          error: 'No resume file uploaded. Please upload a PDF file.',
+        });
+        return;
+      }
+
+      logger.info('Received quality check request', {
+        fileName: req.file.originalname,
+        fileSize: req.file.size,
+      });
+
+      const result = await this.checkResumeQuality.execute({
+
+        resumeBuffer: req.file.buffer,
+        fileName: req.file.originalname,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result.toJSON(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 
   analyze = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
