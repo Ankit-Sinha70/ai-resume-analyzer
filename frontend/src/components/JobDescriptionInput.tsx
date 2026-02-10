@@ -15,7 +15,7 @@ export function JobDescriptionInput({
 
   return (
     <div className="w-full flex flex-col h-full">
-      <div className="relative flex-1">
+      <div className="relative">
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -28,7 +28,7 @@ We are seeking a Senior Software Engineer with:
 • Strong experience with React, TypeScript, Node.js
 • Cloud platform expertise (AWS/GCP/Azure)
 • Excellent problem-solving and communication skills"
-          className="w-full h-full min-h-[280px] p-4 bg-background border border-border rounded-lg resize-none
+          className="w-full min-h-[280px] p-4 bg-background border border-border rounded-lg resize-none
                      focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
                      disabled:cursor-not-allowed disabled:opacity-50
                      placeholder:text-muted-foreground
@@ -37,7 +37,7 @@ We are seeking a Senior Software Engineer with:
         />
       </div>
 
-      <div className="mt-3 flex items-center justify-between px-1">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className={`h-1.5 w-1.5 rounded-full transition-colors ${isValid ? 'bg-primary-500' : 'bg-muted-foreground/30'
             }`} />

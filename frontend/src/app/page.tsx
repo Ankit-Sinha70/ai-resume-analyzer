@@ -111,7 +111,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-6 py-16">
         {!result ? (
           <>
             {/* Hero Section */}
@@ -143,8 +143,8 @@ export default function Home() {
             <div className="flex items-center justify-center gap-4 mb-12">
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 1
-                    ? 'border-primary-500 bg-primary-500 text-white'
-                    : 'border-border bg-background text-muted-foreground'
+                  ? 'border-primary-500 bg-primary-500 text-white'
+                  : 'border-border bg-background text-muted-foreground'
                   }`}>
                   1
                 </div>
@@ -158,8 +158,8 @@ export default function Home() {
 
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 2
-                    ? 'border-primary-500 bg-primary-500 text-white'
-                    : 'border-border bg-background text-muted-foreground'
+                  ? 'border-primary-500 bg-primary-500 text-white'
+                  : 'border-border bg-background text-muted-foreground'
                   }`}>
                   2
                 </div>
@@ -173,8 +173,8 @@ export default function Home() {
 
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 3
-                    ? 'border-primary-500 bg-primary-500 text-white'
-                    : 'border-border bg-background text-muted-foreground'
+                  ? 'border-primary-500 bg-primary-500 text-white'
+                  : 'border-border bg-background text-muted-foreground'
                   }`}>
                   3
                 </div>
