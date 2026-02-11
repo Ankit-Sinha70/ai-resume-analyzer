@@ -6,9 +6,12 @@ import { JobDescriptionInput } from '@/components/JobDescriptionInput';
 import { analyzeResume, getProviderInfo, checkResumeQuality } from '@/lib/api';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { AnalysisResult, ProviderInfo } from '@/types';
-import { FileText, Briefcase, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { FileText, Briefcase, Sparkles, Loader2, ArrowRight, Zap, Shield, Target } from 'lucide-react';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -96,94 +99,227 @@ export default function Home() {
     return null;
   };
 
+  const steps = [
+    { num: 1, label: 'Upload Resume', icon: FileText },
+    { num: 2, label: 'Add Job Context', icon: Briefcase },
+    { num: 3, label: 'Get Analysis', icon: Sparkles },
+  ];
+
+  const features = [
+    { icon: Zap, label: 'AI-Powered', desc: 'Advanced analysis engine' },
+    { icon: Shield, label: 'Privacy First', desc: 'Your data stays secure' },
+    { icon: Target, label: 'Precise Match', desc: 'Skill-level accuracy' },
+  ];
+
+  // Animation variants
+  const springEase = [0.16, 1, 0.3, 1] as const;
+  const bounceEase = [0.34, 1.56, 0.64, 1] as const;
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: springEase },
+    },
+  };
+
   return (
-    <main className="min-h-screen bg-background transition-colors duration-300">
-      {/* Top Navigation */}
-      <nav className="border-b border-border bg-card">
+    <main className="min-h-screen bg-background transition-colors duration-500">
+      {/* ── Navigation ───────────────────────────────────── */}
+      <motion.nav
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="sticky top-0 z-40 glass"
+      >
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3 group cursor-default">
+            <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center shadow-md animate-pulse-glow">
+              <Sparkles className="w-5 h-5 text-primary-foreground group-hover:animate-wiggle transition-transform" />
             </div>
-            <span className="text-lg font-bold text-foreground">ResumeAI</span>
+            <span className="text-lg font-bold text-foreground font-heading tracking-tight">
+              Resume<span className="gradient-text">AI</span>
+            </span>
           </div>
           <ThemeToggle />
         </div>
-      </nav>
+      </motion.nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        {!result ? (
-          <>
-            {/* Hero Section */}
+      <div className="max-w-6xl mx-auto px-6 py-12 sm:py-16">
+        <AnimatePresence mode="wait">
+          {!result ? (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-16"
+              key="input"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, y: -20, transition: { duration: 0.25 } } as any}
             >
-              {/* Version Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm font-medium mb-8">
-                <span className="w-2 h-2 rounded-full bg-primary-500"></span>
-                Standard v2.1
-              </div>
+              {/* ── Hero ───────────────────────────────────────── */}
+              <motion.div variants={itemVariants} className="text-center mb-14">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, ease: bounceEase }}
+                >
+                  <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm font-medium gap-2 shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-primary inline-block animate-pulse" />
+                    Standard v2.1
+                  </Badge>
+                </motion.div>
 
-              {/* Headline */}
-              <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                Architect Your{' '}
-                <span className="text-primary-500">Career Fit</span>
-              </h1>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight font-heading tracking-tight">
+                  Architect Your{' '}
+                  <span className="gradient-text">Career Fit</span>
+                </h1>
 
-              {/* Supporting Description */}
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Deploy advanced AI to map your professional document against market requirements.
-                Identify skill gaps with contextual precision.
-              </p>
-            </motion.div>
+                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                  Deploy advanced AI to map your professional document against market requirements.
+                  Identify skill gaps with contextual precision.
+                </p>
 
-            {/* Horizontal Stepper */}
-            <div className="flex items-center justify-center gap-4 mb-12">
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 1
-                  ? 'border-primary-500 bg-primary-500 text-white'
-                  : 'border-border bg-background text-muted-foreground'
-                  }`}>
-                  1
-                </div>
-                <span className={`text-sm font-medium ${currentStep >= 1 ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                  Upload Resume
-                </span>
-              </div>
+                {/* Feature pills */}
+                <motion.div
+                  variants={itemVariants}
+                  className="flex flex-wrap items-center justify-center gap-3 mt-8"
+                >
+                  {features.map((feat, idx) => (
+                    <motion.div
+                      key={feat.label}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.4 + idx * 0.1, duration: 0.4, ease: bounceEase }}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/80 border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-accent/50 transition-all duration-300 cursor-default group"
+                    >
+                      <feat.icon className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" />
+                      <span className="font-medium">{feat.label}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
 
-              <ArrowRight className="w-4 h-4 text-muted-foreground" />
+              {/* ── Stepper ────────────────────────────────────── */}
+              <motion.div variants={itemVariants} className="flex items-center justify-center gap-3 sm:gap-4 mb-12">
+                {steps.map((step, idx) => {
+                  const StepIcon = step.icon;
+                  const isActive = currentStep >= step.num;
+                  return (
+                    <div key={step.num} className="flex items-center gap-2 sm:gap-3">
+                      {idx > 0 && (
+                        <div className={`hidden sm:block w-8 h-[2px] rounded-full transition-all duration-500 ${isActive ? 'bg-primary shadow-[0_0_8px_rgba(124,109,246,0.3)]' : 'bg-border'
+                          }`} />
+                      )}
+                      <div className="flex items-center gap-2">
+                        <motion.div
+                          animate={{
+                            scale: isActive ? 1 : 0.95,
+                            borderColor: isActive ? 'hsl(252, 85%, 60%)' : 'hsl(220, 20%, 88%)',
+                          }}
+                          transition={{ duration: 0.3, ease: 'easeOut' }}
+                          className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold
+                            border-2 transition-all duration-400
+                            ${isActive
+                              ? 'border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                              : 'border-border bg-background text-muted-foreground'
+                            }`}
+                        >
+                          <StepIcon className="w-4 h-4" />
+                        </motion.div>
+                        <span className={`text-sm font-medium hidden sm:inline transition-colors duration-300 ${isActive ? 'text-foreground' : 'text-muted-foreground'
+                          }`}>
+                          {step.label}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </motion.div>
 
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 2
-                  ? 'border-primary-500 bg-primary-500 text-white'
-                  : 'border-border bg-background text-muted-foreground'
-                  }`}>
-                  2
-                </div>
-                <span className={`text-sm font-medium ${currentStep >= 2 ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                  Add Job Context
-                </span>
-              </div>
+              {/* ── Input Cards ────────────────────────────────── */}
+              <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-6 mb-8">
+                {/* Upload Card */}
+                <motion.div
+                  whileHover={{ y: -4, transition: { duration: 0.25 } }}
+                  className="group"
+                >
+                  <Card className="shadow-depth gradient-border card-glow h-full transition-all duration-300 group-hover:shadow-lg">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="icon-container group-hover:shadow-glow">
+                          <FileText className="w-5 h-5 text-accent-foreground hover-glow-icon" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">Upload Resume</CardTitle>
+                          <CardDescription>PDF format, max 10MB</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <FileUpload
+                        file={file}
+                        onFileChange={setFile}
+                        onError={(msg) => {
+                          setFileError(msg);
+                          if (msg) setError(msg);
+                        }}
+                        error={fileError}
+                        disabled={isLoading}
+                      />
+                    </CardContent>
+                  </Card>
+                </motion.div>
 
-              <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                {/* Job Description Card */}
+                <motion.div
+                  whileHover={{ y: -4, transition: { duration: 0.25 } }}
+                  className="group"
+                >
+                  <Card className="shadow-depth gradient-border card-glow h-full transition-all duration-300 group-hover:shadow-lg">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="icon-container group-hover:shadow-glow">
+                          <Briefcase className="w-5 h-5 text-accent-foreground hover-glow-icon" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">Job Description</CardTitle>
+                          <CardDescription>Paste requirements here</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <JobDescriptionInput
+                        value={jobDescription}
+                        onChange={setJobDescription}
+                        disabled={isLoading}
+                      />
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </motion.div>
 
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 3
-                  ? 'border-primary-500 bg-primary-500 text-white'
-                  : 'border-border bg-background text-muted-foreground'
-                  }`}>
-                  3
-                </div>
-                <span className={`text-sm font-medium ${currentStep >= 3 ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                  Get Analysis
-                </span>
-              </div>
-            </div>
+              {/* ── Error Message ──────────────────────────────── */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                    transition={{ duration: 0.25, ease: springEase }}
+                    className="rounded-lg border border-destructive/30 bg-destructive/10 px-6 py-4 text-sm text-destructive mb-6"
+                  >
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
             {/* Two-Card Layout */}
             <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -215,9 +351,28 @@ export default function Home() {
                 />
               </motion.div>
 
-              {/* Job Description Card */}
+              {/* ── Provider Info ──────────────────────────────── */}
+              {providerInfo && (
+                <motion.p
+                  variants={itemVariants}
+                  className="text-center mt-8 text-xs text-muted-foreground"
+                >
+                  Powered by {providerInfo.aiProvider}
+                </motion.p>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="results"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: springEase }}
+              className="space-y-8"
+            >
+              <AnalysisResults result={result as AnalysisResult} />
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="card card-hover cosmic-float p-8"
@@ -246,59 +401,16 @@ export default function Home() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 px-6 py-4 text-sm text-red-700 dark:text-red-400 mb-6"
               >
-                {error}
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button variant="outline" size="lg" onClick={handleReset} className="group">
+                    <ArrowRight className="w-4 h-4 rotate-180 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
+                    Analyze Another Resume
+                  </Button>
+                </motion.div>
               </motion.div>
-            )}
-
-            {/* CTA Button */}
-            <div className="flex justify-center">
-              <button
-                onClick={handleAnalyze}
-                disabled={isLoading || !file || !jobDescription.trim() || jobDescription.trim().length < 50}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-primary-500 text-white font-semibold rounded-lg
-                         hover:bg-primary-600 focus-ring btn-press
-                         disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed
-                         transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    {isQualityChecking ? 'Evaluating Quality...' : 'Analyzing...'}
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Generate Analysis
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Provider Info */}
-            {providerInfo && (
-              <p className="text-center mt-6 text-xs text-muted-foreground">
-                Powered by {providerInfo.aiProvider}
-              </p>
-            )}
-          </>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-8"
-          >
-            <AnalysisResults result={result as AnalysisResult} />
-            <div className="flex justify-center pt-4">
-              <button
-                onClick={handleReset}
-                className="px-6 py-3 bg-card text-foreground font-medium rounded-lg border border-border
-                         hover:bg-muted transition-all duration-200 shadow-sm hover:shadow focus-ring"
-              >
-                Analyze Another Resume
-              </button>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );

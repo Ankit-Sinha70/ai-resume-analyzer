@@ -13,30 +13,75 @@ import {
   Check,
   Download,
   FileText,
+  TrendingUp,
+  Award,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Progress } from '@/components/ui/progress';
 
 interface AnalysisResultsProps {
   result: AnalysisResult;
 }
 
+const springEase = [0.16, 1, 0.3, 1] as const;
+const bounceEase = [0.34, 1.56, 0.64, 1] as const;
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: springEase },
+  },
+};
+
 export function AnalysisResults({ result }: AnalysisResultsProps) {
   const [copied, setCopied] = useState(false);
+  const [animatedScore, setAnimatedScore] = useState(0);
 
   useEffect(() => {
     if (result.matchPercentage >= 70) {
       confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#7C6DF6', '#C084FC', '#818CF8', '#A78BFA'],
       });
     }
   }, [result.matchPercentage]);
 
+  useEffect(() => {
+    const target = result.matchPercentage;
+    const duration = 1400;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setAnimatedScore(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [result.matchPercentage]);
+
   const getScoreData = (percentage: number) => {
-    if (percentage >= 80) return { label: 'Excellent Match', color: 'text-emerald-600 dark:text-emerald-500' };
-    if (percentage >= 60) return { label: 'Good Match', color: 'text-amber-600 dark:text-amber-500' };
-    return { label: 'Needs Improvement', color: 'text-red-600 dark:text-red-500' };
+    if (percentage >= 80) return { label: 'Excellent Match', variant: 'success' as const, color: 'text-emerald-500 dark:text-emerald-400', ring: 'text-emerald-500' };
+    if (percentage >= 60) return { label: 'Good Match', variant: 'warning' as const, color: 'text-amber-500 dark:text-amber-400', ring: 'text-amber-500' };
+    return { label: 'Needs Improvement', variant: 'destructive' as const, color: 'text-red-500 dark:text-red-400', ring: 'text-red-500' };
   };
 
   const copySuggestions = async () => {
@@ -83,23 +128,23 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
     y += 5;
 
     if (result.matchedSkillDetails && result.matchedSkillDetails.length > 0) {
-      addLine('\\nMatched Skills:', 12, true);
-      result.matchedSkillDetails.forEach(skill => {
+      addLine('Matched Skills:', 12, true);
+      result.matchedSkillDetails.forEach((skill) => {
         addLine(`• ${skill.skill}: ${skill.rationale}`);
       });
     }
 
     if (result.missingSkillDetails && result.missingSkillDetails.length > 0) {
       y += 5;
-      addLine('\\nSkills to Develop:', 12, true);
-      result.missingSkillDetails.forEach(skill => {
+      addLine('Skills to Develop:', 12, true);
+      result.missingSkillDetails.forEach((skill) => {
         addLine(`• ${skill.skill}: ${skill.rationale}`);
       });
     }
 
     if (result.suggestions && result.suggestions.length > 0) {
       y += 5;
-      addLine('\\nRecommendations:', 12, true);
+      addLine('Recommendations:', 12, true);
       result.suggestions.forEach((suggestion, index) => {
         addLine(`${index + 1}. ${suggestion}`);
       });
@@ -110,167 +155,237 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
   };
 
   const scoreData = getScoreData(result.matchPercentage);
+  const strokeDasharray = 2 * Math.PI * 56;
+  const strokeDashoffset = strokeDasharray * (1 - animatedScore / 100);
 
   return (
-    <div className="space-y-6">
-      {/* Score Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="card p-8"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-1">Analysis Complete</h2>
-            <p className="text-sm text-muted-foreground">Your resume has been analyzed against the job requirements</p>
-          </div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-6"
+    >
+      {/* ── Score Card ─────────────────────────────────── */}
+      <motion.div variants={itemVariants}>
+        <Card className="shadow-depth gradient-border card-glow overflow-hidden">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5, ease: bounceEase }}
+                  className="icon-container"
+                >
+                  <Award className="w-5 h-5 text-accent-foreground" />
+                </motion.div>
+                <div>
+                  <CardTitle className="text-2xl font-bold font-heading">Analysis Complete</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Your resume has been analyzed against the job requirements
+                  </p>
+                </div>
+              </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={copySuggestions}
-              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors focus-ring"
-              title="Copy suggestions"
-            >
-              {copied ? <Check className="w-4 h-4 text-primary-500" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
-            </button>
-            <button
-              onClick={downloadMarkdown}
-              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors focus-ring"
-              title="Download Markdown"
-            >
-              <FileText className="w-4 h-4 text-muted-foreground" />
-            </button>
-            <button
-              onClick={downloadPdf}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors focus-ring text-sm font-medium"
-            >
-              <Download className="w-4 h-4 inline mr-2" />
-              Export PDF
-            </button>
-          </div>
-        </div>
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button variant="outline" size="icon" onClick={copySuggestions}>
+                        {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+                      </Button>
+                    </motion.div>
+                  </TooltipTrigger>
+                  <TooltipContent>Copy suggestions</TooltipContent>
+                </Tooltip>
 
-        {/* Match Score */}
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <svg className="w-32 h-32 transform -rotate-90">
-              <circle
-                cx="64"
-                cy="64"
-                r="56"
-                stroke="currentColor"
-                strokeWidth="12"
-                fill="none"
-                className="text-muted"
-              />
-              <circle
-                cx="64"
-                cy="64"
-                r="56"
-                stroke="currentColor"
-                strokeWidth="12"
-                fill="none"
-                strokeDasharray={`${2 * Math.PI * 56}`}
-                strokeDashoffset={`${2 * Math.PI * 56 * (1 - result.matchPercentage / 100)}`}
-                className={scoreData.color}
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold text-foreground">{result.matchPercentage}%</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button variant="outline" size="icon" onClick={downloadMarkdown}>
+                        <FileText className="w-4 h-4" />
+                      </Button>
+                    </motion.div>
+                  </TooltipTrigger>
+                  <TooltipContent>Download Markdown</TooltipContent>
+                </Tooltip>
+
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button onClick={downloadPdf} size="sm" className="gradient-primary border-0 group">
+                    <Download className="w-4 h-4 group-hover:animate-wiggle" />
+                    Export PDF
+                  </Button>
+                </motion.div>
+              </div>
             </div>
-          </div>
+          </CardHeader>
 
-          <div className="flex-1">
-            <h3 className={`text-xl font-semibold ${scoreData.color} mb-2`}>{scoreData.label}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {result.matchPercentage >= 80 && "Outstanding! Your resume aligns exceptionally well with the job requirements."}
-              {result.matchPercentage >= 60 && result.matchPercentage < 80 && "Strong fit! Your resume shows good alignment with most requirements."}
-              {result.matchPercentage < 60 && "Consider developing the missing skills to improve your match score."}
-            </p>
-          </div>
-        </div>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row items-center gap-8">
+              {/* Score Ring */}
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.6, ease: bounceEase }}
+                className="relative flex-shrink-0"
+              >
+                <svg className="w-36 h-36 transform -rotate-90">
+                  <circle
+                    cx="72" cy="72" r="56"
+                    stroke="currentColor" strokeWidth="10"
+                    fill="none" className="text-muted/50"
+                  />
+                  <circle
+                    cx="72" cy="72" r="56"
+                    stroke="currentColor" strokeWidth="10"
+                    fill="none"
+                    strokeDasharray={strokeDasharray}
+                    strokeDashoffset={strokeDashoffset}
+                    className={scoreData.ring}
+                    strokeLinecap="round"
+                    style={{
+                      transition: 'stroke-dashoffset 1.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      filter: 'drop-shadow(0 0 6px currentColor)',
+                    }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-3xl font-bold text-foreground font-heading">{animatedScore}%</span>
+                </div>
+              </motion.div>
+
+              <div className="flex-1 text-center sm:text-left">
+                <div className="flex items-center gap-3 mb-3 justify-center sm:justify-start">
+                  <TrendingUp className={`w-5 h-5 ${scoreData.color}`} />
+                  <h3 className={`text-xl font-semibold ${scoreData.color}`}>{scoreData.label}</h3>
+                  <Badge variant={scoreData.variant}>{result.matchPercentage}%</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  {result.matchPercentage >= 80 && 'Outstanding! Your resume aligns exceptionally well with the job requirements.'}
+                  {result.matchPercentage >= 60 && result.matchPercentage < 80 && 'Strong fit! Your resume shows good alignment with most requirements.'}
+                  {result.matchPercentage < 60 && 'Consider developing the missing skills to improve your match score.'}
+                </p>
+                <Progress value={result.matchPercentage} className="h-2" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
 
-      {/* Skills Overview */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Matched Skills */}
-        {result.matchedSkillDetails && result.matchedSkillDetails.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="card p-6"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Validated Skills</h3>
-            </div>
-            <div className="space-y-3">
-              {result.matchedSkillDetails.map((item, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-muted/50 border border-border">
-                  <div className="font-medium text-sm text-foreground mb-1">{item.skill}</div>
-                  <p className="text-xs text-muted-foreground">{item.rationale}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+      {/* ── Gradient Divider ───────────────────────────── */}
+      <div className="divider-gradient" />
 
-        {/* Missing Skills */}
-        {result.missingSkillDetails && result.missingSkillDetails.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="card p-6"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950 flex items-center justify-center">
-                <XCircle className="w-5 h-5 text-amber-600 dark:text-amber-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Areas to Develop</h3>
-            </div>
-            <div className="space-y-3">
-              {result.missingSkillDetails.map((item, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-muted/50 border border-border">
-                  <div className="font-medium text-sm text-foreground mb-1">{item.skill}</div>
-                  <p className="text-xs text-muted-foreground">{item.rationale}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </div>
+      {/* ── Skills & Recommendations Tabs ──────────────── */}
+      <motion.div variants={itemVariants}>
+        <Card className="shadow-depth gradient-border card-glow">
+          <CardContent className="pt-6">
+            <Tabs defaultValue="matched" className="w-full">
+              <TabsList className="w-full grid grid-cols-3 mb-6">
+                <TabsTrigger value="matched" className="gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Validated</span>
+                  {result.matchedSkillDetails?.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+                      {result.matchedSkillDetails.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="missing" className="gap-2">
+                  <XCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">To Develop</span>
+                  {result.missingSkillDetails?.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+                      {result.missingSkillDetails.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="suggestions" className="gap-2">
+                  <Lightbulb className="w-4 h-4" />
+                  <span className="hidden sm:inline">Advice</span>
+                  {result.suggestions?.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+                      {result.suggestions.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              </TabsList>
 
-      {/* Recommendations */}
-      {result.suggestions && result.suggestions.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="card p-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-950 flex items-center justify-center">
-              <Lightbulb className="w-5 h-5 text-primary-500" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">Strategic Recommendations</h3>
-          </div>
-          <ul className="space-y-3">
-            {result.suggestions.map((suggestion, index) => (
-              <li key={index} className="flex gap-3 text-sm">
-                <span className="font-semibold text-primary-500 flex-shrink-0">{index + 1}.</span>
-                <span className="text-foreground leading-relaxed">{suggestion}</span>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      )}
-    </div>
+              {/* Matched Skills */}
+              <TabsContent value="matched">
+                {result.matchedSkillDetails && result.matchedSkillDetails.length > 0 ? (
+                  <div className="space-y-3 stagger-children">
+                    {result.matchedSkillDetails.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-900/30 transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 cursor-default group"
+                      >
+                        <div className="flex items-start gap-3">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />
+                          <div>
+                            <div className="font-medium text-sm text-foreground">{item.skill}</div>
+                            <p className="text-xs text-muted-foreground mt-1">{item.rationale}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No matched skills found.</p>
+                )}
+              </TabsContent>
+
+              {/* Missing Skills */}
+              <TabsContent value="missing">
+                {result.missingSkillDetails && result.missingSkillDetails.length > 0 ? (
+                  <div className="space-y-3 stagger-children">
+                    {result.missingSkillDetails.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-lg bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:bg-amber-50 dark:hover:bg-amber-950/30 cursor-default group"
+                      >
+                        <div className="flex items-start gap-3">
+                          <XCircle className="w-4 h-4 text-amber-500 dark:text-amber-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />
+                          <div>
+                            <div className="font-medium text-sm text-foreground">{item.skill}</div>
+                            <p className="text-xs text-muted-foreground mt-1">{item.rationale}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No missing skills identified.</p>
+                )}
+              </TabsContent>
+
+              {/* Suggestions */}
+              <TabsContent value="suggestions">
+                {result.suggestions && result.suggestions.length > 0 ? (
+                  <div className="space-y-3 stagger-children">
+                    {result.suggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="p-4 rounded-lg bg-accent/30 border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:bg-accent/50 cursor-default group"
+                      >
+                        <div className="flex gap-3">
+                          <span className="text-sm font-bold text-primary flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                            {index + 1}
+                          </span>
+                          <span className="text-sm text-foreground leading-relaxed">{suggestion}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-8">No suggestions available.</p>
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -280,7 +395,7 @@ function buildMarkdown(result: AnalysisResult): string {
 
   if (result.matchedSkillDetails && result.matchedSkillDetails.length > 0) {
     md += `## Validated Skills\n\n`;
-    result.matchedSkillDetails.forEach(skill => {
+    result.matchedSkillDetails.forEach((skill) => {
       md += `- **${skill.skill}**: ${skill.rationale}\n`;
     });
     md += `\n`;
@@ -288,7 +403,7 @@ function buildMarkdown(result: AnalysisResult): string {
 
   if (result.missingSkillDetails && result.missingSkillDetails.length > 0) {
     md += `## Skills to Develop\n\n`;
-    result.missingSkillDetails.forEach(skill => {
+    result.missingSkillDetails.forEach((skill) => {
       md += `- **${skill.skill}**: ${skill.rationale}\n`;
     });
     md += `\n`;
