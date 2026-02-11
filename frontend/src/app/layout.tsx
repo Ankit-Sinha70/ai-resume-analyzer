@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/providers/ThemeProvider';
-import { CosmicBackground } from '@/components/CosmicBackground';
-import { CursorTrail } from '@/components/CursorTrail';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { CursorEffects } from '@/components/CursorEffects';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -28,10 +28,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CosmicBackground />
-          <CursorTrail />
-          {children}
-          <Toaster position="top-center" richColors />
+          <TooltipProvider delayDuration={300}>
+            {/* Animated mesh gradient background */}
+            <div className="mesh-gradient" aria-hidden="true" />
+            {/* Cursor sparkle effects */}
+            <CursorEffects />
+            <div className="relative min-h-screen">
+              {children}
+            </div>
+            <Toaster position="top-center" richColors />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
