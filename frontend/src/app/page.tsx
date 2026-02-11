@@ -321,33 +321,34 @@ export default function Home() {
                 )}
               </AnimatePresence>
 
-              {/* ── CTA Button ─────────────────────────────────── */}
-              <motion.div variants={itemVariants} className="flex justify-center">
-                <motion.div
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                >
-                  <Button
-                    onClick={handleAnalyze}
-                    disabled={isLoading || !file || !jobDescription.trim() || jobDescription.trim().length < 50}
-                    size="xl"
-                    className="shadow-lg gradient-primary border-0 group"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        {isQualityChecking ? 'Evaluating Quality...' : 'Analyzing...'}
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-5 h-5 group-hover:animate-wiggle" />
-                        Generate Analysis
-                        <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" />
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
+            {/* Two-Card Layout */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {/* Upload Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="card card-hover cosmic-float p-8"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-950 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-primary-500" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Upload Resume</h2>
+                    <p className="text-sm text-muted-foreground">PDF format, max 10MB</p>
+                  </div>
+                </div>
+                <FileUpload
+                  file={file}
+                  onFileChange={setFile}
+                  onError={(msg) => {
+                    setFileError(msg);
+                    if (msg) setError(msg);
+                  }}
+                  error={fileError}
+                  disabled={isLoading}
+                />
               </motion.div>
 
               {/* ── Provider Info ──────────────────────────────── */}
@@ -373,8 +374,32 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.4 }}
-                className="flex justify-center pt-4"
+                transition={{ delay: 0.2 }}
+                className="card card-hover cosmic-float p-8"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-950 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-primary-500" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Job Description</h2>
+                    <p className="text-sm text-muted-foreground">Paste requirements here</p>
+                  </div>
+                </div>
+                <JobDescriptionInput
+                  value={jobDescription}
+                  onChange={setJobDescription}
+                  disabled={isLoading}
+                />
+              </motion.div>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 px-6 py-4 text-sm text-red-700 dark:text-red-400 mb-6"
               >
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                   <Button variant="outline" size="lg" onClick={handleReset} className="group">
