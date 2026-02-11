@@ -4,6 +4,8 @@ import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UploadCloud, FileCheck, X, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface FileUploadProps {
   file: File | null;
@@ -24,7 +26,6 @@ export function FileUpload({ file, onFileChange, disabled, error, onError }: Fil
         onFileChange(selectedFile);
         onError?.('');
 
-        // Simulate upload progress
         setIsUploading(true);
         setUploadProgress(0);
         const interval = setInterval(() => {
@@ -86,19 +87,19 @@ export function FileUpload({ file, onFileChange, disabled, error, onError }: Fil
               relative cursor-pointer rounded-lg border-2 border-dashed p-8 text-center
               transition-all duration-200
               ${isDragActive
-                ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20'
-                : 'border-border hover:border-primary-500/50 hover:bg-muted/50'
+                ? 'border-primary bg-accent/50 scale-[1.01]'
+                : 'border-border hover:border-primary/50 hover:bg-muted/50'
               }
               ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-              ${error ? 'border-red-300 dark:border-red-800' : ''}
+              ${error ? 'border-destructive/50' : ''}
             `}
           >
             <input {...getInputProps()} />
 
             <div className={`
-              inline-flex p-4 rounded-lg mb-4 transition-colors duration-200
+              inline-flex p-4 rounded-xl mb-4 transition-all duration-200
               ${isDragActive
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary text-primary-foreground shadow-md scale-110'
                 : 'bg-muted text-muted-foreground'
               }
             `}>
@@ -110,7 +111,7 @@ export function FileUpload({ file, onFileChange, disabled, error, onError }: Fil
                 {isDragActive ? 'Drop your resume here' : 'Upload your resume'}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Drag and drop or click to browse • PDF only, max 10MB
+                Drag and drop or click to browse · PDF only, max 10MB
               </p>
             </div>
 
@@ -118,7 +119,7 @@ export function FileUpload({ file, onFileChange, disabled, error, onError }: Fil
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex items-center justify-center gap-2 text-red-600 dark:text-red-400 text-sm"
+                className="mt-4 flex items-center justify-center gap-2 text-destructive text-sm"
               >
                 <AlertCircle className="w-4 h-4" />
                 {error}
@@ -128,26 +129,28 @@ export function FileUpload({ file, onFileChange, disabled, error, onError }: Fil
         ) : (
           <motion.div
             key="file-preview"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="rounded-lg border border-border bg-card p-4"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="rounded-lg border border-border bg-card p-4 shadow-sm"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-primary-100 dark:bg-primary-950 flex items-center justify-center flex-shrink-0">
-                <FileCheck className="w-6 h-6 text-primary-500" />
+              <div className="w-12 h-12 rounded-lg bg-accent flex items-center justify-center flex-shrink-0">
+                <FileCheck className="w-6 h-6 text-accent-foreground" />
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-sm font-semibold text-foreground truncate">{file.name}</h3>
                   {!disabled && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={removeFile}
-                      className="p-1 hover:bg-muted rounded transition-colors"
+                      className="h-7 w-7 flex-shrink-0"
                     >
-                      <X className="w-4 h-4 text-muted-foreground" />
-                    </button>
+                      <X className="w-4 h-4" />
+                    </Button>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -155,15 +158,8 @@ export function FileUpload({ file, onFileChange, disabled, error, onError }: Fil
                 </p>
 
                 {isUploading && (
-                  <div className="mt-2">
-                    <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-primary-500"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${uploadProgress}%` }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </div>
+                  <div className="mt-3">
+                    <Progress value={uploadProgress} className="h-1.5" />
                   </div>
                 )}
               </div>

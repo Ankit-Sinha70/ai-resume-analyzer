@@ -4,75 +4,81 @@
 
 @layer base {
   :root {
-    /* Enterprise Light Theme - Calm & Professional */
+    /* ── Light Theme ─────────────────────────────────── */
     --background: 210 20% 98%;
-    /* #F8FAFC - Soft off-white */
     --foreground: 222 47% 11%;
-    /* #0F172A - Deep slate for headings */
 
     --card: 0 0% 100%;
-    /* #FFFFFF - Pure white cards */
     --card-foreground: 215 25% 27%;
-    /* #475569 - Body text */
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Single accent color - Indigo/Violet */
     --primary: 248 73% 69%;
-    /* #6D5EF6 */
     --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215 16% 47%;
-    /* #94A3B8 - Muted text */
 
-    --accent: 248 73% 69%;
-    /* Same as primary - single source */
-    --accent-foreground: 0 0% 100%;
+    --accent: 248 73% 95%;
+    --accent-foreground: 248 73% 50%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 214 32% 91%;
-    /* #E5E7EB - Subtle borders */
     --input: 214 32% 91%;
     --ring: 248 73% 69%;
-    /* Accent for focus states */
 
-    --radius: 1rem;
-    /* 16px - Standard border radius */
+    --radius: 0.75rem;
+
+    /* ── Chart palette ───────────────────────────────── */
+    --chart-1: 248 73% 69%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 43 96% 56%;
+    --chart-4: 27 87% 67%;
+    --chart-5: 12 76% 61%;
   }
 
   .dark {
-    /* Enterprise Dark Theme - Deep & Comfortable */
+    /* ── Dark Theme ──────────────────────────────────── */
     --background: 222 47% 6%;
-    /* #0B1020 - Deep navy background */
     --foreground: 210 40% 98%;
-    /* #F9FAFB - Almost white for headings */
 
     --card: 215 28% 9%;
-    /* #111827 - Card background */
     --card-foreground: 214 20% 83%;
-    /* #CBD5E1 - Body text */
 
     --popover: 215 28% 9%;
     --popover-foreground: 210 40% 98%;
 
-    /* Single accent color - Same indigo */
     --primary: 248 73% 69%;
-    /* #6D5EF6 */
     --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 33% 14%;
+    --secondary-foreground: 210 40% 98%;
 
     --muted: 217 33% 17%;
     --muted-foreground: 215 14% 54%;
-    /* #64748B - Muted text */
 
-    --accent: 248 73% 69%;
-    /* Same as primary */
-    --accent-foreground: 0 0% 100%;
+    --accent: 248 73% 20%;
+    --accent-foreground: 248 73% 80%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 217 33% 17%;
-    /* #1F2937 - Subtle dark borders */
     --input: 217 33% 17%;
     --ring: 248 73% 69%;
+
+    /* ── Chart palette (dark) ────────────────────────── */
+    --chart-1: 248 73% 69%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -85,41 +91,62 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Inter', system-ui, sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
+/* ── Micro-interaction utilities ─────────────────────── */
 @layer utilities {
 
-  /* Clean card style - no glassmorphism */
-  .card {
-    @apply bg-card text-card-foreground rounded-2xl border border-border shadow-sm;
+  /* Hover lift — card floats up on hover */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
   }
 
-  /* Subtle hover elevation */
-  .card-hover {
-    @apply transition-shadow duration-200 hover:shadow-md;
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.08),
+      0 4px 12px rgba(0, 0, 0, 0.04);
   }
 
-  /* Focus ring for accessibility */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  .dark .hover-lift:hover {
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      0 0 1px rgba(109, 94, 246, 0.15);
   }
 
-  /* Muted text utility */
-  .text-muted {
-    @apply text-muted-foreground;
+  /* Shadow depth — layered 3D shadow */
+  .shadow-depth {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 4px 12px rgba(0, 0, 0, 0.04),
+      0 8px 24px rgba(0, 0, 0, 0.06);
   }
 
-  /* Subtle animations only */
-  .animate-subtle-fade {
-    animation: subtleFade 0.3s ease-out;
+  .dark .shadow-depth {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      0 0 1px rgba(109, 94, 246, 0.08);
   }
 
-  @keyframes subtleFade {
+  /* Press scale — active click feedback */
+  .press-scale {
+    @apply active:scale-[0.97] transition-transform duration-100;
+  }
+
+  /* Subtle fade-in entrance */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out both;
+  }
+
+  @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(4px);
+      transform: translateY(12px);
     }
 
     to {
@@ -128,8 +155,8 @@
     }
   }
 
-  /* Button press feedback */
-  .btn-press {
-    @apply active:scale-[0.98] transition-transform duration-100;
+  /* Stagger children — use on parent, children get delay */
+  .stagger-children>* {
+    animation: fadeInUp 0.4s ease-out both;
   }
 }

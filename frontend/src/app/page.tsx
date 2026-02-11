@@ -9,6 +9,9 @@ import { AnalysisResult, ProviderInfo } from '@/types';
 import { FileText, Briefcase, Sparkles, Loader2, ArrowRight } from 'lucide-react';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -96,209 +99,215 @@ export default function Home() {
     return null;
   };
 
+  const steps = [
+    { num: 1, label: 'Upload Resume' },
+    { num: 2, label: 'Add Job Context' },
+    { num: 3, label: 'Get Analysis' },
+  ];
+
   return (
     <main className="min-h-screen bg-background transition-colors duration-300">
-      {/* Top Navigation */}
-      <nav className="border-b border-border bg-card">
+      {/* ── Navigation ───────────────────────────────────── */}
+      <nav className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shadow-md glow-primary">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold text-foreground">ResumeAI</span>
+            <span className="text-lg font-bold text-foreground font-heading">ResumeAI</span>
           </div>
           <ThemeToggle />
         </div>
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-16">
-        {!result ? (
-          <>
-            {/* Hero Section */}
+        <AnimatePresence mode="wait">
+          {!result ? (
             <motion.div
+              key="input"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* ── Hero ───────────────────────────────────────── */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-center mb-16"
+              >
+                <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm font-medium gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary inline-block" />
+                  Standard v2.1
+                </Badge>
+
+                <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight font-heading">
+                  Architect Your{' '}
+                  <span className="text-primary bg-gradient-to-r from-primary-500 to-primary-400 bg-clip-text text-transparent">
+                    Career Fit
+                  </span>
+                </h1>
+
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                  Deploy advanced AI to map your professional document against market requirements.
+                  Identify skill gaps with contextual precision.
+                </p>
+              </motion.div>
+
+              {/* ── Stepper ────────────────────────────────────── */}
+              <div className="flex items-center justify-center gap-3 sm:gap-4 mb-12">
+                {steps.map((step, idx) => (
+                  <div key={step.num} className="flex items-center gap-2 sm:gap-3">
+                    {idx > 0 && (
+                      <div className={`hidden sm:block w-8 h-[2px] rounded-full transition-colors duration-300 ${currentStep >= step.num ? 'bg-primary' : 'bg-border'
+                        }`} />
+                    )}
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
+                        border-2 transition-all duration-300
+                        ${currentStep >= step.num
+                          ? 'border-primary bg-primary text-primary-foreground shadow-md'
+                          : 'border-border bg-background text-muted-foreground'
+                        }`}
+                      >
+                        {step.num}
+                      </div>
+                      <span className={`text-sm font-medium hidden sm:inline transition-colors duration-200 ${currentStep >= step.num ? 'text-foreground' : 'text-muted-foreground'
+                        }`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── Input Cards ────────────────────────────────── */}
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                {/* Upload Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.4 }}
+                >
+                  <Card className="hover-lift shadow-depth h-full">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-accent-foreground" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">Upload Resume</CardTitle>
+                          <CardDescription>PDF format, max 10MB</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <FileUpload
+                        file={file}
+                        onFileChange={setFile}
+                        onError={(msg) => {
+                          setFileError(msg);
+                          if (msg) setError(msg);
+                        }}
+                        error={fileError}
+                        disabled={isLoading}
+                      />
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* Job Description Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.4 }}
+                >
+                  <Card className="hover-lift shadow-depth h-full">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+                          <Briefcase className="w-5 h-5 text-accent-foreground" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">Job Description</CardTitle>
+                          <CardDescription>Paste requirements here</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <JobDescriptionInput
+                        value={jobDescription}
+                        onChange={setJobDescription}
+                        disabled={isLoading}
+                      />
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </div>
+
+              {/* ── Error Message ──────────────────────────────── */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                    transition={{ duration: 0.2 }}
+                    className="rounded-lg border border-destructive/30 bg-destructive/10 px-6 py-4 text-sm text-destructive mb-6"
+                  >
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* ── CTA Button ─────────────────────────────────── */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleAnalyze}
+                  disabled={isLoading || !file || !jobDescription.trim() || jobDescription.trim().length < 50}
+                  size="xl"
+                  className="shadow-lg glow-primary"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      {isQualityChecking ? 'Evaluating Quality...' : 'Analyzing...'}
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
+                      Generate Analysis
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* ── Provider Info ──────────────────────────────── */}
+              {providerInfo && (
+                <p className="text-center mt-6 text-xs text-muted-foreground">
+                  Powered by {providerInfo.aiProvider}
+                </p>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="results"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-16"
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-8"
             >
-              {/* Version Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm font-medium mb-8">
-                <span className="w-2 h-2 rounded-full bg-primary-500"></span>
-                Standard v2.1
+              <AnalysisResults result={result as AnalysisResult} />
+              <div className="flex justify-center pt-4">
+                <Button variant="outline" size="lg" onClick={handleReset} className="press-scale">
+                  Analyze Another Resume
+                </Button>
               </div>
-
-              {/* Headline */}
-              <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                Architect Your{' '}
-                <span className="text-primary-500">Career Fit</span>
-              </h1>
-
-              {/* Supporting Description */}
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Deploy advanced AI to map your professional document against market requirements.
-                Identify skill gaps with contextual precision.
-              </p>
             </motion.div>
-
-            {/* Horizontal Stepper */}
-            <div className="flex items-center justify-center gap-4 mb-12">
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 1
-                  ? 'border-primary-500 bg-primary-500 text-white'
-                  : 'border-border bg-background text-muted-foreground'
-                  }`}>
-                  1
-                </div>
-                <span className={`text-sm font-medium ${currentStep >= 1 ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                  Upload Resume
-                </span>
-              </div>
-
-              <ArrowRight className="w-4 h-4 text-muted-foreground" />
-
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 2
-                  ? 'border-primary-500 bg-primary-500 text-white'
-                  : 'border-border bg-background text-muted-foreground'
-                  }`}>
-                  2
-                </div>
-                <span className={`text-sm font-medium ${currentStep >= 2 ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                  Add Job Context
-                </span>
-              </div>
-
-              <ArrowRight className="w-4 h-4 text-muted-foreground" />
-
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 3
-                  ? 'border-primary-500 bg-primary-500 text-white'
-                  : 'border-border bg-background text-muted-foreground'
-                  }`}>
-                  3
-                </div>
-                <span className={`text-sm font-medium ${currentStep >= 3 ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                  Get Analysis
-                </span>
-              </div>
-            </div>
-
-            {/* Two-Card Layout */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              {/* Upload Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="card card-hover p-8"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-950 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-primary-500" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-foreground">Upload Resume</h2>
-                    <p className="text-sm text-muted-foreground">PDF format, max 10MB</p>
-                  </div>
-                </div>
-                <FileUpload
-                  file={file}
-                  onFileChange={setFile}
-                  onError={(msg) => {
-                    setFileError(msg);
-                    if (msg) setError(msg);
-                  }}
-                  error={fileError}
-                  disabled={isLoading}
-                />
-              </motion.div>
-
-              {/* Job Description Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="card card-hover p-8"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-950 flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-primary-500" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-foreground">Job Description</h2>
-                    <p className="text-sm text-muted-foreground">Paste requirements here</p>
-                  </div>
-                </div>
-                <JobDescriptionInput
-                  value={jobDescription}
-                  onChange={setJobDescription}
-                  disabled={isLoading}
-                />
-              </motion.div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 px-6 py-4 text-sm text-red-700 dark:text-red-400 mb-6"
-              >
-                {error}
-              </motion.div>
-            )}
-
-            {/* CTA Button */}
-            <div className="flex justify-center">
-              <button
-                onClick={handleAnalyze}
-                disabled={isLoading || !file || !jobDescription.trim() || jobDescription.trim().length < 50}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-primary-500 text-white font-semibold rounded-lg
-                         hover:bg-primary-600 focus-ring btn-press
-                         disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed
-                         transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    {isQualityChecking ? 'Evaluating Quality...' : 'Analyzing...'}
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Generate Analysis
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Provider Info */}
-            {providerInfo && (
-              <p className="text-center mt-6 text-xs text-muted-foreground">
-                Powered by {providerInfo.aiProvider}
-              </p>
-            )}
-          </>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-8"
-          >
-            <AnalysisResults result={result as AnalysisResult} />
-            <div className="flex justify-center pt-4">
-              <button
-                onClick={handleReset}
-                className="px-6 py-3 bg-card text-foreground font-medium rounded-lg border border-border
-                         hover:bg-muted transition-all duration-200 shadow-sm hover:shadow focus-ring"
-              >
-                Analyze Another Resume
-              </button>
-            </div>
-          </motion.div>
-        )}
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );

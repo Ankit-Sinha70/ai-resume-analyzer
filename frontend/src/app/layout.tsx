@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/providers/ThemeProvider';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -19,19 +19,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${jakarta.variable} font-sans`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${jakarta.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {/* <div className="absolute right-4 top-4 z-50">
-            <ThemeToggle />
-          </div> */}
-          {children}
-          <Toaster position="top-center" richColors />
+          <TooltipProvider delayDuration={300}>
+            {/* Subtle dot-grid background */}
+            <div className="fixed inset-0 dot-grid pointer-events-none" aria-hidden="true" />
+            <div className="relative min-h-screen">
+              {children}
+            </div>
+            <Toaster position="top-center" richColors />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
