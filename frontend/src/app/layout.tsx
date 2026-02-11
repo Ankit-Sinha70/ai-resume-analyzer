@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { CursorEffects } from '@/components/CursorEffects';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -28,8 +29,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider delayDuration={300}>
-            {/* Subtle dot-grid background */}
-            <div className="fixed inset-0 dot-grid pointer-events-none" aria-hidden="true" />
+            {/* Animated mesh gradient background */}
+            <div className="mesh-gradient" aria-hidden="true" />
+            {/* Cursor sparkle effects */}
+            <CursorEffects />
             <div className="relative min-h-screen">
               {children}
             </div>
