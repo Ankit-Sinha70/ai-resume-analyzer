@@ -8,7 +8,7 @@ const server = app.listen(PORT, () => {
   logger.info(`🚀 Server running on port ${PORT}`);
   logger.info(`📝 Environment: ${env.NODE_ENV}`);
   logger.info(`🔗 API URL: http://localhost:${PORT}`);
-  logger.info(`🌐 Frontend URL: ${env.FRONTEND_URL}`);
+  logger.info(`🌐 Allowed Origins: ${env.CORS_ORIGIN}`);
 });
 
 // Graceful shutdown
